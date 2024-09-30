@@ -56,7 +56,7 @@ const App = () => {
 
   useEffect(() => {
     const jpgUrl = 'https://img.freepik.com/foto-gratis/montanas-vestrahorn-stokksnes-islandia_335224-667.jpg';
-    const localImagePath = './img/test.jpg'; // Ajusta la ruta local según tu estructura
+    const localImagePath = './img/test.jpg';
 
     const compressImages = async () => {
       // Compress img from URL
