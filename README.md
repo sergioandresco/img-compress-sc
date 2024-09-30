@@ -1,6 +1,6 @@
 # img-compressor-sc
 
-![img-compressor-sc logo](https://i.postimg.cc/m25SZ7LP/Black-Yellow-Graffiti-General-Twitch-Banner.png)
+![img-compressor-sc logo](assets/img/img-compressor-sc.jpg)
 
 ## Easy images compressor for to use
 
