@@ -33,7 +33,7 @@ Note: In the SVG format is manipulation of vector, not compression.
 You can add img-compressor-sc in your project via npm.
 
 ```
-npm install img-compress-sc
+npm install img-compressor-sc
 ```
 
 After installation, you need import the components.
