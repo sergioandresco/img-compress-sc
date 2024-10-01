@@ -1,23 +1,15 @@
-import axios from 'axios';
-import imageCompression from 'browser-image-compression';
+const axios = require('axios');
+const imageCompression = require('browser-image-compression');
 
 async function compressImage(imageInput, options = {}) {
   let imageFile;
 
   if (typeof imageInput === 'string' && imageInput.startsWith('http')) {
-    // Si es una URL, descarga la imagen como un array buffer
-    const response = await axios({
-      url: imageInput,
-      responseType: 'arraybuffer',
-    });
-    const buffer = Buffer.from(response.data, 'binary');
-
-    // Convertir el buffer en un Blob
-    imageFile = new Blob([buffer], { type: 'image/jpeg' }); // Cambia el tipo según sea necesario
-  } else if (imageInput instanceof File) {
-    imageFile = imageInput;
+    const response = await axios.get(imageInput, { responseType: 'blob' });
+    const blob = response.data;
+    imageFile = new File([blob], 'image.jpg', { type: blob.type });
   } else {
-    throw new Error('Invalid input type: must be a URL or a File');
+    throw new Error('Invalid input type: must be a URL');
   }
 
   const compressionOptions = {
@@ -41,4 +33,8 @@ async function compressImages(imageInputs, options = {}) {
   return compressedImages;
 }
 
-export { compressImage, compressImages };
+// Exportar las funciones
+module.exports = {
+  compressImage,
+  compressImages,
+};
