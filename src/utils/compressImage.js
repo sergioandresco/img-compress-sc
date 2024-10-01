@@ -1,46 +1,37 @@
-const sharp = require('sharp');
-const axios = require('axios');
-const fs = require('fs');
+import imageCompression from 'browser-image-compression';
 
 async function compressImage(imageInput, options = {}) {
-  let buffer;
+  let imageFile;
 
-  // Verificar si la entrada es una URL o un buffer
   if (typeof imageInput === 'string' && imageInput.startsWith('http')) {
-    // Si es una URL, descarga la imagen
-    const response = await axios({
-      url: imageInput,
-      responseType: 'arraybuffer',
-    });
-    buffer = Buffer.from(response.data, 'binary');
-  } else if (typeof imageInput === 'string' && fs.existsSync(imageInput)) {
-    // Si es una ruta de archivo local, léelo directamente
-    buffer = fs.readFileSync(imageInput);
-  } else if (Buffer.isBuffer(imageInput)) {
-    // Si es un buffer, úsalo directamente
-    buffer = imageInput;
+    const response = await fetch(imageInput);
+    const blob = await response.blob();
+    imageFile = new File([blob], 'image.jpg', { type: blob.type });
+  } else if (imageInput instanceof File) {
+    imageFile = imageInput;
   } else {
-    throw new Error('Invalid input type: must be a URL, file path, or Buffer');
+    throw new Error('Invalid input type: must be a URL or a File');
   }
 
-  // Comprimir la imagen
-  const compressedImage = await sharp(buffer)
-    .toFormat(options.format || 'jpeg', { quality: options.quality || 80 })
-    .toBuffer();
+  const compressionOptions = {
+    maxSizeMB: options.maxSizeMB || 1,
+    maxWidthOrHeight: options.maxWidthOrHeight || 1024,
+    useWebWorker: options.useWebWorker || true,
+  };
 
+  const compressedImage = await imageCompression(imageFile, compressionOptions);
   return compressedImage;
 }
 
-async function compressImagesSync(imageInputs, options = {}) {
-  const compressedImages = {};
-  
-  for (let index = 0; index < imageInputs.length; index++) {
-    const input = imageInputs[index];
+async function compressImages(imageInputs, options = {}) {
+  const compressedImages = [];
+
+  for (let input of imageInputs) {
     const compressedImage = await compressImage(input, options);
-    compressedImages[`image${index}`] = compressedImage; // Guardar en un objeto con claves dinámicas
+    compressedImages.push(compressedImage);
   }
-  
+
   return compressedImages;
 }
 
-module.exports = { compressImage, compressImagesSync };
+export { compressImage, compressImages };

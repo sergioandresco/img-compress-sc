@@ -1,5 +1,6 @@
-const compressImage = require('./utils/compressImage').compressImage;
+const { compressImage, compressImages } = require('./utils/compressImage');
 
 module.exports = {
-  compressImage
+  compressImage,
+  compressImages
 };
