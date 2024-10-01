@@ -1,11 +1,12 @@
+import axios from 'axios';
 import imageCompression from 'browser-image-compression';
 
 async function compressImage(imageInput, options = {}) {
   let imageFile;
 
   if (typeof imageInput === 'string' && imageInput.startsWith('http')) {
-    const response = await fetch(imageInput);
-    const blob = await response.blob();
+    const response = await axios.get(imageInput, { responseType: 'blob' });
+    const blob = response.data;
     imageFile = new File([blob], 'image.jpg', { type: blob.type });
   } else if (imageInput instanceof File) {
     imageFile = imageInput;
@@ -14,9 +15,9 @@ async function compressImage(imageInput, options = {}) {
   }
 
   const compressionOptions = {
-    maxSizeMB: options.maxSizeMB || 1,
-    maxWidthOrHeight: options.maxWidthOrHeight || 1024,
-    useWebWorker: options.useWebWorker || true,
+    maxSizeMB: 1,
+    useWebWorker: true,
+    initialQuality: options.quality || 80,
   };
 
   const compressedImage = await imageCompression(imageFile, compressionOptions);
