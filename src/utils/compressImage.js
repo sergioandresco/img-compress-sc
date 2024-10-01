@@ -5,10 +5,15 @@ async function compressImage(imageInput, options = {}) {
   let imageFile;
 
   if (typeof imageInput === 'string' && imageInput.startsWith('http')) {
-    
-    const response = await axios.get(imageInput, { responseType: 'arraybuffer' });
-    const blob = new Blob([response.data], { type: response.headers['content-type'] });
-    imageFile = new File([blob], 'image.jpg', { type: blob.type });
+    // Si es una URL, descarga la imagen como un array buffer
+    const response = await axios({
+      url: imageInput,
+      responseType: 'arraybuffer',
+    });
+    const buffer = Buffer.from(response.data, 'binary');
+
+    // Convertir el buffer en un Blob
+    imageFile = new Blob([buffer], { type: 'image/jpeg' }); // Cambia el tipo según sea necesario
   } else if (imageInput instanceof File) {
     imageFile = imageInput;
   } else {
