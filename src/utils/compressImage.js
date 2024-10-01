@@ -5,7 +5,7 @@ async function compressImage(imageInput, options = {}) {
   let imageFile;
 
   if (typeof imageInput === 'string' && imageInput.startsWith('http')) {
-    const response = await axios.get(imageInput, { responseType: 'blob' });
+    const response = await axios.get(`https://cors-anywhere.herokuapp.com/${imageInput}`, { responseType: 'blob' }); // Usar proxy CORS
     const blob = response.data;
     imageFile = new File([blob], 'image.jpg', { type: blob.type });
   } else if (imageInput instanceof File) {
