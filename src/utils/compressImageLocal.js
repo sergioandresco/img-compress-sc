@@ -1,36 +1,24 @@
-const fs = require('fs');
-const sharp = require('sharp');
+// src/compressLocal.js
+import imageCompression from 'browser-image-compression';
 
-async function compressLocalImage(imageInput, options = {}) {
-  let buffer;
+const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/tiff', 'image/avif', 'image/svg+xml'];
 
-  if (typeof imageInput === 'string' && fs.existsSync(imageInput)) {
-    buffer = fs.readFileSync(imageInput);
-  } else {
-    throw new Error('Invalid input type: must be a valid file path');
+export const compressLocalImage = async (file, maxQuality = 80) => {
+  if (!validImageTypes.includes(file.type)) {
+    throw new Error('Tipo de archivo no soportado. Acepta JPEG, JPG, PNG, WEBP, TIFF, AVIF y SVG.');
   }
 
-  const compressedImage = await sharp(buffer)
-    .toFormat(options.format || 'jpeg', { quality: options.quality || 80 })
-    .toBuffer();
+  const options = {
+    maxSizeMB: 1, // Puedes ajustar esto según tus necesidades
+    useWebWorker: true,
+    initialQuality: maxQuality / 100, // Usar solo la calidad especificada
+  };
 
-  return compressedImage;
-}
-
-async function compressLocalImages(imageInputs, options = {}) {
-  const compressedImages = {};
-
-  for (let index = 0; index < imageInputs.length; index++) {
-    const input = imageInputs[index];
-    const compressedImage = await compressLocalImage(input, options);
-    compressedImages[`image${index}`] = compressedImage; // Guardar en un objeto con claves dinámicas
+  try {
+    const compressedFile = await imageCompression(file, options);
+    return compressedFile;
+  } catch (error) {
+    console.error('Error al comprimir la imagen local:', error);
+    throw error;
   }
-
-  return compressedImages;
-}
-
-// Exportar las funciones
-module.exports = {
-  compressLocalImage,
-  compressLocalImages,
 };
